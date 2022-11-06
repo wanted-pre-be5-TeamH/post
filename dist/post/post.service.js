@@ -13,6 +13,7 @@ exports.PostService = void 0;
 const common_1 = require("@nestjs/common");
 const runtime_1 = require("@prisma/client/runtime");
 const prisma_service_1 = require("../prisma/prisma.service");
+const argon = require("argon2");
 let PostService = class PostService {
     constructor(prisma) {
         this.prisma = prisma;
@@ -20,31 +21,116 @@ let PostService = class PostService {
     async create(dto) {
         console.log(dto);
         try {
-            const post = await this.prisma.post.create({
-                data: Object.assign({}, dto)
-            });
-            return post;
+            const regExp = /[0-9]/;
+            if (regExp.test(dto.hash) && dto.hash.length > 5) {
+                const newHash = await argon.hash(dto.hash);
+                const post = await this.prisma.post.create({
+                    data: {
+                        title: dto.title,
+                        content: dto.content,
+                        hash: newHash,
+                        weather: dto.weather
+                    }
+                });
+                delete post.hash;
+                return post;
+            }
+            else {
+                return 'PW must contain at least one number and length must be over 6 characters';
+            }
         }
         catch (err) {
             if (err instanceof runtime_1.PrismaClientKnownRequestError) {
-                console.log(`Coupon Create Err : ${err}`);
+                console.log(`Post Create Err : ${err}`);
             }
             throw err;
         }
     }
-    async updatePost(id, dto) {
+    async updatePost(id, pw, dto) {
         try {
             const postId = parseInt(id);
-            const result = await this.prisma.post.update({
+            const post = await this.prisma.post.findFirst({
                 where: {
                     id: postId
-                },
-                data: Object.assign({}, dto)
+                }
             });
+            if (post) {
+                const pwMatches = await argon.verify(post.hash, pw);
+                let result;
+                if (pwMatches) {
+                    result = await this.prisma.post.update({
+                        where: {
+                            id: postId
+                        },
+                        data: Object.assign({}, dto)
+                    });
+                    return result;
+                }
+                else {
+                    return 'PW is wrong';
+                }
+            }
+            else {
+                return 'ID is wrong';
+            }
         }
         catch (err) {
             if (err instanceof runtime_1.PrismaClientKnownRequestError) {
-                console.log(`Coupon Create Err : ${err}`);
+                console.log(`Post Update Err : ${err}`);
+            }
+            throw err;
+        }
+    }
+    async remove(id, pw) {
+        try {
+            const postId = parseInt(id);
+            const post = await this.prisma.post.findFirst({
+                where: {
+                    id: postId
+                }
+            });
+            if (post) {
+                const pwMatches = await argon.verify(post.hash, pw);
+                let result;
+                if (pwMatches) {
+                    result = await this.prisma.post.delete({
+                        where: {
+                            id: postId
+                        },
+                    });
+                    return result;
+                }
+                else {
+                    return 'PW is wrong';
+                }
+            }
+            else {
+                return 'ID is wrong';
+            }
+        }
+        catch (err) {
+            if (err instanceof runtime_1.PrismaClientKnownRequestError) {
+                console.log(`Post Update Err : ${err}`);
+            }
+            throw err;
+        }
+    }
+    async getPostPagination(page, count) {
+        try {
+            const pageNumber = parseInt(page);
+            const countNumber = parseInt(count);
+            const posts = this.prisma.post.findMany({
+                skip: pageNumber * countNumber,
+                take: countNumber,
+                orderBy: {
+                    createdAt: 'desc'
+                }
+            });
+            return posts;
+        }
+        catch (err) {
+            if (err instanceof runtime_1.PrismaClientKnownRequestError) {
+                console.log(`Post Update Err : ${err}`);
             }
             throw err;
         }
@@ -57,9 +143,6 @@ let PostService = class PostService {
     }
     update(id, updatePostDto) {
         return `This action updates a #${id} post`;
-    }
-    remove(id) {
-        return `This action removes a #${id} post`;
     }
 };
 PostService = __decorate([

@@ -24,6 +24,15 @@ let PostController = class PostController {
     create(createPostDto) {
         return this.postService.create(createPostDto);
     }
+    updatePost(id, pw, dto) {
+        return this.postService.updatePost(id, pw, dto);
+    }
+    remove(id, pw) {
+        return this.postService.remove(id, pw);
+    }
+    getPost(page, count) {
+        return this.postService.getPostPagination(page, count);
+    }
     findAll() {
         return this.postService.findAll();
     }
@@ -33,12 +42,6 @@ let PostController = class PostController {
     update(id, updatePostDto) {
         return this.postService.update(+id, updatePostDto);
     }
-    remove(id) {
-        return this.postService.remove(+id);
-    }
-    updatePost(id, dto) {
-        return this.postService.updatePost(id, dto);
-    }
 };
 __decorate([
     (0, common_1.Post)(),
@@ -47,6 +50,31 @@ __decorate([
     __metadata("design:paramtypes", [create_post_dto_1.CreatePostDto]),
     __metadata("design:returntype", void 0)
 ], PostController.prototype, "create", null);
+__decorate([
+    (0, common_1.Put)(':id/:password'),
+    __param(0, (0, common_1.Query)('id')),
+    __param(1, (0, common_1.Query)('password')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, update_post_dto_1.UpdatePostDto]),
+    __metadata("design:returntype", void 0)
+], PostController.prototype, "updatePost", null);
+__decorate([
+    (0, common_1.Delete)(':id/:password'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Param)('password')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", void 0)
+], PostController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Get)(),
+    __param(0, (0, common_1.Query)('page')),
+    __param(1, (0, common_1.Query)('count')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", void 0)
+], PostController.prototype, "getPost", null);
 __decorate([
     (0, common_1.Get)(),
     __metadata("design:type", Function),
@@ -68,23 +96,8 @@ __decorate([
     __metadata("design:paramtypes", [String, update_post_dto_1.UpdatePostDto]),
     __metadata("design:returntype", void 0)
 ], PostController.prototype, "update", null);
-__decorate([
-    (0, common_1.Delete)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], PostController.prototype, "remove", null);
-__decorate([
-    (0, common_1.Put)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, create_post_dto_1.CreatePostDto]),
-    __metadata("design:returntype", void 0)
-], PostController.prototype, "updatePost", null);
 PostController = __decorate([
-    (0, common_1.Controller)('post'),
+    (0, common_1.Controller)('api/post'),
     __metadata("design:paramtypes", [post_service_1.PostService])
 ], PostController);
 exports.PostController = PostController;

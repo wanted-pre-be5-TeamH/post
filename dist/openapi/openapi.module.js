@@ -6,20 +6,17 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AppModule = void 0;
+exports.OpenapiModule = void 0;
 const common_1 = require("@nestjs/common");
-const config_1 = require("@nestjs/config");
-const post_module_1 = require("./post/post.module");
-const prisma_module_1 = require("./prisma/prisma.module");
-const openapi_module_1 = require("./openapi/openapi.module");
-let AppModule = class AppModule {
+const openapi_service_1 = require("./openapi.service");
+const openapi_controller_1 = require("./openapi.controller");
+let OpenapiModule = class OpenapiModule {
 };
-AppModule = __decorate([
+OpenapiModule = __decorate([
     (0, common_1.Module)({
-        imports: [config_1.ConfigModule.forRoot({
-                isGlobal: true
-            }), post_module_1.PostModule, prisma_module_1.PrismaModule, openapi_module_1.OpenapiModule],
+        controllers: [openapi_controller_1.OpenapiController],
+        providers: [openapi_service_1.OpenapiService]
     })
-], AppModule);
-exports.AppModule = AppModule;
-//# sourceMappingURL=app.module.js.map
+], OpenapiModule);
+exports.OpenapiModule = OpenapiModule;
+//# sourceMappingURL=openapi.module.js.map
